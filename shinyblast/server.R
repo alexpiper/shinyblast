@@ -7,55 +7,32 @@ library(shiny)
 library(shinyalert)
 
 
-
-
 # Start server code -------------------------------------------------------
 
 server <- function(input, output, session){
   # Read in BLAST functions
   source("blast_utilities.R", local = TRUE)
   
-  
-#bserveEvent(input$preview, {
-#   if (condition == TRUE) {
-#     do something }
-#   shinyalert("Oops!", "Something went wrong.", type = "error")
-# })
-#
-#   need(Sys.which("blastn") != "", shinyalert(
-#       title = "Hello",
-#       text = "This is a modal",
-#       closeOnEsc = TRUE,
-#       closeOnClickOutside = TRUE,
-#       html = TRUE,
-#       type = "error",
-#       showConfirmButton = TRUE,
-#       showCancelButton = FALSE,
-#       confirmButtonText = "OK",
-#       confirmButtonCol = "#AEDEF4",
-#       timer = 0,
-#       imageUrl = "",
-#       animation = TRUE
-# )
-  
   blastresults <- eventReactive(input$blast, {
     if(Sys.which("blastn") == ""){
-      shinyalert("Error!", "Could not locate blast install.", type = "error")
-      #shinyalert(
-      #  title = "Error!",
-      #  text = "Please manually input blast location",
-      #  type = "input",
-      #  inputType="text",
-      #  callbackR = function(x) {
-      #    message("Attempting to load blast from ", normalizePath(x)) 
-      #    blast_setpath(normalizePath(x))
-      #    message(Sys.which("blastn"))
-      #    if (Sys.which("blastn") == ""){
-      #      shinyalert("Error!", "Could not locate blast install.", type = "error")
-      #    } else if (Sys.which("blastn") != ""){
-      #      shinyalert("Sucess!", "Blast sucessfully located", type = "success")
-      #    }
-      #  })
+      shinyalert(
+        title = "Error!",
+        text = "Please manually input blast location",
+        type = "input",
+        inputType="text",
+        callbackR = function(x) {
+          message("Attempting to load blast from ", normalizePath(x)) 
+          old_path <- Sys.getenv("PATH")
+          install_path <- list.dirs(x, full.names = TRUE)[str_detect(list.dirs(x, full.names = TRUE),"/bin$")]
+          message(install_path)
+          Sys.setenv(PATH = paste(old_path, normalizePath(install_path), sep = ":"))
+          message(Sys.which("blastn"))
+          if (Sys.which("blastn") == ""){
+            shinyalert("Error!", "Could not locate blast install.", type = "error")
+          } else if (Sys.which("blastn") != ""){
+            shinyalert("Sucess!", "Blast sucessfully located", type = "success")
+          }
+        })
     } else {
     #gather input and set up temp file
     query <- input$query
