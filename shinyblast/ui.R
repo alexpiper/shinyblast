@@ -44,5 +44,5 @@ ui <- fluidPage(theme = shinytheme("lumen"),
                   verbatimTextOutput("alignment")
                 ),
                 hr(),
-                print("App maintained by Alexander Piper")
+                print("App maintainer: alexander.piper@agriculture.vic.gov.au")
 )
